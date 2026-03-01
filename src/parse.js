@@ -42,11 +42,26 @@ function parsePatchText(patch, text) {
 }
 
 export async function loadScores() {
-  const index = await fetch('./data/patches/index.json').then(r => r.json());
+  const [index, heroData] = await Promise.all([
+    fetch('./data/patches/index.json').then(r => r.json()),
+    fetch('./data/heroes.json').then(r => r.json())
+  ]);
+
   const all = [];
-  for (const p of index.patches) {
+  const patches = [...index.patches].sort((a,b)=>a.patch.localeCompare(b.patch));
+
+  for (const p of patches) {
     const txt = await fetch(`./data/patches/${p.file}`).then(r => r.text());
-    all.push(...parsePatchText(p.patch, txt));
+    const parsed = parsePatchText(p.patch, txt);
+    const byHero = new Map(parsed.map(r => [r.hero, r]));
+
+    for (const hero of heroData.heroes) {
+      if (byHero.has(hero)) {
+        all.push(byHero.get(hero));
+      } else {
+        all.push({ hero, patch: p.patch, score: 0, changes: ['No direct hero-specific notes found in source patch.'], tags: ['utility'] });
+      }
+    }
   }
   return all;
 }
