@@ -17,6 +17,10 @@ function heroImage(name) {
   return `./data/hero-images/${slug}.png`;
 }
 
+function heroRichKey(name) {
+  return `h_${slugifyHero(name).replace(/-/g, '_')}`;
+}
+
 function render() {
   const q = searchEl.value.trim().toLowerCase();
   const tag = tagEl.value;
@@ -30,7 +34,7 @@ function render() {
     name: { color: '#dbe7ff', align: 'left', padding: [0, 0, 0, 6], fontSize: 11 }
   };
   for (const h of heroes) {
-    const key = `h_${slugifyHero(h)}`;
+    const key = heroRichKey(h);
     rich[key] = {
       height: 16,
       width: 16,
@@ -53,7 +57,7 @@ function render() {
       type: 'category',
       data: heroes,
       axisLabel: {
-        formatter: (value) => `{h_${slugifyHero(value)}| } {name|${value}}`,
+        formatter: (value) => `{${heroRichKey(value)}| } {name|${value}}`,
         rich,
         margin: 10
       }
