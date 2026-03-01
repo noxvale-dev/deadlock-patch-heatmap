@@ -77,13 +77,22 @@ function render() {
       }
     },
     visualMap: {
-      min: -3, max: 3, calculable: true, orient: 'horizontal', left: 'center', bottom: 10,
-      inRange: { color: ['#7f1d1d','#b91c1c','#f59e0b','#1f2937','#10b981','#22c55e','#15803d'] }
+      min: -3,
+      max: 3,
+      calculable: true,
+      orient: 'horizontal',
+      left: 'center',
+      bottom: 10,
+      inRange: { color: ['#7f1d1d','#b91c1c','#f59e0b','#334155','#10b981','#22c55e','#15803d'] }
     },
     series: [{
       type: 'heatmap',
       data,
       label: { show: false },
+      itemStyle: {
+        borderColor: '#0b1020',
+        borderWidth: 1
+      },
       emphasis: { itemStyle: { shadowBlur: 12, shadowColor: 'rgba(0,0,0,0.6)', borderColor: '#e5e7eb', borderWidth: 1 } }
     }]
   });
