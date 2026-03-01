@@ -83,8 +83,8 @@ function render() {
     series: [{
       type: 'heatmap',
       data,
-      label: { show: true, formatter: (p) => p.data[2] },
-      emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' } }
+      label: { show: false },
+      emphasis: { itemStyle: { shadowBlur: 12, shadowColor: 'rgba(0,0,0,0.6)', borderColor: '#e5e7eb', borderWidth: 1 } }
     }]
   });
 
