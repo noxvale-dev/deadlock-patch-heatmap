@@ -12,8 +12,13 @@ const chart = echarts.init(chartEl);
 const kpiHeroesEl = document.getElementById('kpiHeroes');
 const kpiBuffedEl = document.getElementById('kpiBuffed');
 const kpiNerfedEl = document.getElementById('kpiNerfed');
+const prevPatchesBtn = document.getElementById('prevPatches');
+const nextPatchesBtn = document.getElementById('nextPatches');
+const patchWindowLabel = document.getElementById('patchWindowLabel');
 
 let all = [];
+let patchWindowStart = 0;
+const PATCH_WINDOW_SIZE = 14;
 
 function slugifyHero(name) {
   return name.toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
@@ -34,24 +39,39 @@ function render() {
   const filtered = all.filter(r => (!q || r.hero.toLowerCase().includes(q)) && (tag === 'all' || r.tags.includes(tag)));
 
   const heroes = [...new Set(filtered.map(r => r.hero))];
-  const patches = [...new Set(filtered.map(r => r.patch))].sort();
-  const data = filtered.map(r => ({
-    value: [patches.indexOf(r.patch), heroes.indexOf(r.hero), r.score],
-    meta: r
-  }));
+  const allPatches = [...new Set(filtered.map(r => r.patch))].sort();
+
+  if (patchWindowStart > Math.max(0, allPatches.length - PATCH_WINDOW_SIZE)) {
+    patchWindowStart = Math.max(0, allPatches.length - PATCH_WINDOW_SIZE);
+  }
+
+  const visiblePatches = allPatches.slice(patchWindowStart, patchWindowStart + PATCH_WINDOW_SIZE);
+  const patchSet = new Set(visiblePatches);
+
+  const data = filtered
+    .filter(r => patchSet.has(r.patch))
+    .map(r => ({
+      value: [visiblePatches.indexOf(r.patch), heroes.indexOf(r.hero), r.score],
+      meta: r
+    }));
 
   const sorted = [...filtered].sort((a,b)=>b.score-a.score);
   const mostBuffed = sorted.find(r=>r.score>0);
   const mostNerfed = [...sorted].reverse().find(r=>r.score<0);
 
+  patchWindowLabel.textContent = `Patches ${patchWindowStart + 1}-${Math.min(allPatches.length, patchWindowStart + PATCH_WINDOW_SIZE)} of ${allPatches.length}`;
+  prevPatchesBtn.disabled = patchWindowStart <= 0;
+  nextPatchesBtn.disabled = patchWindowStart + PATCH_WINDOW_SIZE >= allPatches.length;
+
   // Keep cells closer to square by adapting chart height to row/column ratio.
-  const gridLeft = 290;
+  const gridLeft = 320;
   const gridRight = 20;
   const gridTop = 40;
   const gridBottom = 120;
-  const usableWidth = Math.max(320, chartEl.clientWidth - gridLeft - gridRight);
-  const cellSize = Math.max(10, Math.round((usableWidth / Math.max(1, patches.length)) * 0.72));
-  const targetHeight = Math.max(640, Math.min(1600, Math.round(gridTop + gridBottom + heroes.length * cellSize)));
+  const usableWidth = Math.max(280, chartEl.clientWidth - gridLeft - gridRight);
+  const baseCell = (usableWidth / Math.max(1, visiblePatches.length)) * 0.6;
+  const cellSize = Math.max(12, Math.min(20, Math.round(baseCell)));
+  const targetHeight = Math.max(720, Math.min(1700, Math.round(gridTop + gridBottom + heroes.length * cellSize)));
   chartEl.style.height = `${targetHeight}px`;
   chart.resize();
   kpiHeroesEl.textContent = String(heroes.length);
@@ -59,13 +79,13 @@ function render() {
   kpiNerfedEl.textContent = mostNerfed ? `${mostNerfed.hero} (${mostNerfed.score})` : 'None';
 
   const rich = {
-    name: { color: '#dbe7ff', align: 'left', padding: [0, 0, 0, 10], fontSize: 16, fontWeight: 700 }
+    name: { color: '#dbe7ff', align: 'left', padding: [0, 0, 0, 12], fontSize: 17, fontWeight: 700 }
   };
   for (const h of heroes) {
     const key = heroRichKey(h);
     rich[key] = {
-      height: 30,
-      width: 30,
+      height: 34,
+      width: 34,
       align: 'center',
       backgroundColor: { image: heroImage(h) },
       borderRadius: 3
@@ -90,7 +110,7 @@ function render() {
     grid: { top: gridTop, left: gridLeft, right: gridRight, bottom: gridBottom },
     xAxis: {
       type: 'category',
-      data: patches,
+      data: visiblePatches,
       axisLabel: { rotate: 35 },
       splitArea: { show: true }
     },
@@ -155,6 +175,8 @@ function render() {
 async function main() {
   try {
     all = await loadScores();
+    const initialPatches = [...new Set(all.map(r => r.patch))].sort();
+    patchWindowStart = Math.max(0, initialPatches.length - PATCH_WINDOW_SIZE);
     if (!all.length) {
       chartEl.innerHTML = '<div class="muted">No data loaded. Check patch files/index.</div>';
       return;
@@ -166,7 +188,15 @@ async function main() {
   }
 }
 
-searchEl.addEventListener('input', render);
-tagEl.addEventListener('change', render);
+searchEl.addEventListener('input', () => { patchWindowStart = 0; render(); });
+tagEl.addEventListener('change', () => { patchWindowStart = 0; render(); });
+prevPatchesBtn?.addEventListener('click', () => {
+  patchWindowStart = Math.max(0, patchWindowStart - PATCH_WINDOW_SIZE);
+  render();
+});
+nextPatchesBtn?.addEventListener('click', () => {
+  patchWindowStart = patchWindowStart + PATCH_WINDOW_SIZE;
+  render();
+});
 window.addEventListener('resize', () => chart.resize());
 main();
