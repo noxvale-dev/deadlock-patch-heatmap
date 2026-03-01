@@ -45,13 +45,13 @@ function render() {
   const mostNerfed = [...sorted].reverse().find(r=>r.score<0);
 
   // Keep cells closer to square by adapting chart height to row/column ratio.
-  const gridLeft = 170;
+  const gridLeft = 220;
   const gridRight = 20;
   const gridTop = 40;
   const gridBottom = 120;
   const usableWidth = Math.max(320, chartEl.clientWidth - gridLeft - gridRight);
-  const cellSize = usableWidth / Math.max(1, patches.length);
-  const targetHeight = Math.max(700, Math.min(1800, Math.round(gridTop + gridBottom + heroes.length * cellSize)));
+  const cellSize = Math.max(10, Math.round((usableWidth / Math.max(1, patches.length)) * 0.72));
+  const targetHeight = Math.max(640, Math.min(1600, Math.round(gridTop + gridBottom + heroes.length * cellSize)));
   chartEl.style.height = `${targetHeight}px`;
   chart.resize();
   kpiHeroesEl.textContent = String(heroes.length);
@@ -59,13 +59,13 @@ function render() {
   kpiNerfedEl.textContent = mostNerfed ? `${mostNerfed.hero} (${mostNerfed.score})` : 'None';
 
   const rich = {
-    name: { color: '#dbe7ff', align: 'left', padding: [0, 0, 0, 6], fontSize: 11 }
+    name: { color: '#dbe7ff', align: 'left', padding: [0, 0, 0, 8], fontSize: 13, fontWeight: 600 }
   };
   for (const h of heroes) {
     const key = heroRichKey(h);
     rich[key] = {
-      height: 16,
-      width: 16,
+      height: 22,
+      width: 22,
       align: 'center',
       backgroundColor: { image: heroImage(h) },
       borderRadius: 3
