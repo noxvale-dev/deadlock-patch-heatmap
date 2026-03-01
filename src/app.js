@@ -43,10 +43,17 @@ function render() {
   const sorted = [...filtered].sort((a,b)=>b.score-a.score);
   const mostBuffed = sorted.find(r=>r.score>0);
   const mostNerfed = [...sorted].reverse().find(r=>r.score<0);
-  const maxVisibleColumns = 6;
-  const initialEnd = patches.length > maxVisibleColumns
-    ? Math.max(15, (maxVisibleColumns / patches.length) * 100)
-    : 100;
+
+  // Keep cells closer to square by adapting chart height to row/column ratio.
+  const gridLeft = 170;
+  const gridRight = 20;
+  const gridTop = 40;
+  const gridBottom = 120;
+  const usableWidth = Math.max(320, chartEl.clientWidth - gridLeft - gridRight);
+  const cellSize = usableWidth / Math.max(1, patches.length);
+  const targetHeight = Math.max(700, Math.min(1800, Math.round(gridTop + gridBottom + heroes.length * cellSize)));
+  chartEl.style.height = `${targetHeight}px`;
+  chart.resize();
   kpiHeroesEl.textContent = String(heroes.length);
   kpiBuffedEl.textContent = mostBuffed ? `${mostBuffed.hero} (${mostBuffed.score > 0 ? '+' : ''}${mostBuffed.score})` : 'None';
   kpiNerfedEl.textContent = mostNerfed ? `${mostNerfed.hero} (${mostNerfed.score})` : 'None';
@@ -77,7 +84,7 @@ function render() {
         return `<div style="max-width:360px"><b>${r.hero}</b> @ ${r.patch}<br/>impact: <b>${score}</b><br/><span style="color:#93a4c4">${r.tags.join(', ')}</span><hr style="border:none;border-top:1px solid #27314d"/>${r.changes.slice(0,3).join('<br/>')}</div>`;
       }
     },
-    grid: { top: 40, left: 170, right: 20, bottom: 120 },
+    grid: { top: gridTop, left: gridLeft, right: gridRight, bottom: gridBottom },
     xAxis: {
       type: 'category',
       data: patches,
@@ -89,6 +96,8 @@ function render() {
       data: heroes,
       splitArea: { show: true },
       axisLabel: {
+        interval: 0,
+        hideOverlap: false,
         formatter: (value) => `{${heroRichKey(value)}| } {name|${value}}`,
         rich,
         margin: 10
@@ -100,24 +109,6 @@ function render() {
       max: 3,
       inRange: { color: ['#7f1d1d','#b91c1c','#f59e0b','#334155','#10b981','#22c55e','#15803d'] }
     },
-    dataZoom: [
-      {
-        type: 'slider',
-        xAxisIndex: 0,
-        start: 0,
-        end: initialEnd,
-        height: 12,
-        bottom: 88,
-        borderColor: '#27314d',
-        fillerColor: 'rgba(59,130,246,0.25)'
-      },
-      {
-        type: 'inside',
-        xAxisIndex: 0,
-        start: 0,
-        end: initialEnd
-      }
-    ],
     series: [{
       type: 'heatmap',
       data,
