@@ -5,6 +5,9 @@ const detailsEl = document.getElementById('details');
 const searchEl = document.getElementById('search');
 const tagEl = document.getElementById('tag');
 const chart = echarts.init(chartEl);
+const kpiHeroesEl = document.getElementById('kpiHeroes');
+const kpiBuffedEl = document.getElementById('kpiBuffed');
+const kpiNerfedEl = document.getElementById('kpiNerfed');
 
 let all = [];
 
@@ -30,6 +33,13 @@ function render() {
   const patches = [...new Set(filtered.map(r => r.patch))].sort();
   const data = filtered.map(r => [patches.indexOf(r.patch), heroes.indexOf(r.hero), r.score, r]);
 
+  const sorted = [...filtered].sort((a,b)=>b.score-a.score);
+  const mostBuffed = sorted.find(r=>r.score>0);
+  const mostNerfed = [...sorted].reverse().find(r=>r.score<0);
+  kpiHeroesEl.textContent = String(heroes.length);
+  kpiBuffedEl.textContent = mostBuffed ? `${mostBuffed.hero} (${mostBuffed.score > 0 ? '+' : ''}${mostBuffed.score})` : 'None';
+  kpiNerfedEl.textContent = mostNerfed ? `${mostNerfed.hero} (${mostNerfed.score})` : 'None';
+
   const rich = {
     name: { color: '#dbe7ff', align: 'left', padding: [0, 0, 0, 6], fontSize: 11 }
   };
@@ -46,9 +56,13 @@ function render() {
 
   chart.setOption({
     tooltip: {
+      backgroundColor: '#0f1730',
+      borderColor: '#334155',
+      textStyle: { color: '#e5e7eb' },
       formatter: (p) => {
         const r = p.data[3];
-        return `<b>${r.hero}</b> @ ${r.patch}<br/>score: <b>${r.score}</b><br/>${r.changes.slice(0,3).join('<br/>')}`;
+        const score = r.score > 0 ? `+${r.score}` : `${r.score}`;
+        return `<div style="max-width:360px"><b>${r.hero}</b> @ ${r.patch}<br/>impact: <b>${score}</b><br/><span style="color:#93a4c4">${r.tags.join(', ')}</span><hr style="border:none;border-top:1px solid #27314d"/>${r.changes.slice(0,3).join('<br/>')}</div>`;
       }
     },
     grid: { top: 40, left: 170, right: 20, bottom: 80 },
@@ -74,21 +88,24 @@ function render() {
     }]
   });
 
-  chart.off('click');
-  chart.on('click', (p) => {
-    const r = p.data[3];
+  const renderDetails = (r) => {
     const img = heroImage(r.hero);
     detailsEl.innerHTML = `
       <div class="hero-line">
         <img src="${img}" onerror="this.onerror=null;this.src='./data/hero-images/placeholder.svg'" alt="${r.hero}" />
         <div>
           <div class="hero-name">${r.hero} @ ${r.patch}</div>
-          <div class="muted">score: ${r.score} · tags: ${r.tags.join(', ')}</div>
+          <div class="muted">score: ${r.score > 0 ? '+' : ''}${r.score} · tags: ${r.tags.join(', ')}</div>
         </div>
       </div>
       <div>- ${r.changes.join('<br/>- ')}</div>
     `;
-  });
+  };
+
+  chart.off('click');
+  chart.on('click', (p) => renderDetails(p.data[3]));
+
+  if (mostBuffed) renderDetails(mostBuffed);
 }
 
 async function main() {

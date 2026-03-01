@@ -9,12 +9,20 @@
     :root { color-scheme: dark; }
     body { margin:0; font-family: Inter, system-ui, Arial, sans-serif; background:#0b1020; color:#e5e7eb; }
     .wrap { max-width: 1200px; margin: 0 auto; padding: 16px; }
-    .row { display:flex; gap:16px; }
+    .row { display:flex; gap:16px; flex-wrap:wrap; }
     .card { background:#11182e; border:1px solid #27314d; border-radius:12px; padding:12px; }
-    #chart { width: 100%; height: 560px; }
+    #chart { width: 100%; height: 640px; }
     #details { min-height: 180px; white-space: pre-wrap; }
     select,input { background:#0f1730; color:#e5e7eb; border:1px solid #334155; border-radius:8px; padding:8px; }
     .muted{color:#93a4c4}
+    .hero-line{display:flex; align-items:center; gap:10px; margin:8px 0}
+    .hero-line img{width:44px; height:44px; object-fit:cover; border-radius:8px; border:1px solid #2f3c5e}
+    .hero-name{font-weight:600}
+    .kpi{min-width:200px; flex:1}
+    .kpi .label{font-size:12px; color:#93a4c4}
+    .kpi .value{font-size:20px; font-weight:700}
+    .legend{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+    .dot{width:12px; height:12px; border-radius:2px; display:inline-block}
   </style>
 </head>
 <body>
@@ -37,6 +45,24 @@
         </label>
       </div>
     </div>
+
+    <div class="row" style="margin-top:16px">
+      <div class="card kpi"><div class="label">Visible heroes</div><div id="kpiHeroes" class="value">-</div></div>
+      <div class="card kpi"><div class="label">Most buffed (current filters)</div><div id="kpiBuffed" class="value">-</div></div>
+      <div class="card kpi"><div class="label">Most nerfed (current filters)</div><div id="kpiNerfed" class="value">-</div></div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="legend">
+        <span class="muted">How to read:</span>
+        <span><span class="dot" style="background:#7f1d1d"></span> strong nerf</span>
+        <span><span class="dot" style="background:#f59e0b"></span> slight nerf</span>
+        <span><span class="dot" style="background:#1f2937"></span> neutral</span>
+        <span><span class="dot" style="background:#22c55e"></span> buff</span>
+        <span class="muted">(Click any cell for exact notes)</span>
+      </div>
+    </div>
+
     <div class="card" style="margin-top:16px"><div id="chart"></div></div>
     <div class="card" style="margin-top:16px">
       <h3>Selection details</h3>
