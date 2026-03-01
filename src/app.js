@@ -72,6 +72,16 @@ function render() {
     };
   }
 
+  const palette = {
+    minus3: '#7f1d1d',
+    minus2: '#b91c1c',
+    minus1: '#d9480f',
+    zero: '#334155',
+    plus1: '#14b8a6',
+    plus2: '#22c55e',
+    plus3: '#16a34a'
+  };
+
   chart.setOption({
     tooltip: {
       backgroundColor: '#0f1730',
@@ -107,7 +117,7 @@ function render() {
       show: false,
       min: -3,
       max: 3,
-      inRange: { color: ['#7f1d1d','#b91c1c','#f59e0b','#334155','#10b981','#22c55e','#15803d'] }
+      inRange: { color: [palette.minus3, palette.minus2, palette.minus1, palette.zero, palette.plus1, palette.plus2, palette.plus3] }
     },
     series: [{
       type: 'heatmap',
@@ -118,13 +128,13 @@ function render() {
         borderWidth: 1,
         color: (p) => {
           const v = Number(p.data?.value?.[2] ?? 0);
-          if (v >= 3) return '#15803d';
-          if (v === 2) return '#22c55e';
-          if (v === 1) return '#10b981';
-          if (v === 0) return '#334155';
-          if (v === -1) return '#f59e0b';
-          if (v === -2) return '#b91c1c';
-          return '#7f1d1d';
+          if (v >= 3) return palette.plus3;
+          if (v === 2) return palette.plus2;
+          if (v === 1) return palette.plus1;
+          if (v === 0) return palette.zero;
+          if (v === -1) return palette.minus1;
+          if (v === -2) return palette.minus2;
+          return palette.minus3;
         }
       },
       emphasis: { itemStyle: { shadowBlur: 12, shadowColor: 'rgba(0,0,0,0.6)', borderColor: '#e5e7eb', borderWidth: 1 } }
@@ -133,6 +143,7 @@ function render() {
 
   const renderDetails = (r) => {
     const img = heroImage(r.hero);
+    const changes = (r.changes || []).map(c => `<li>${c}</li>`).join('');
     detailsEl.innerHTML = `
       <div class="hero-line">
         <img src="${img}" onerror="this.onerror=null;this.src='./data/hero-images/placeholder.svg'" alt="${r.hero}" />
@@ -141,7 +152,7 @@ function render() {
           <div class="muted">score: ${r.score > 0 ? '+' : ''}${r.score} · tags: ${r.tags.join(', ')}</div>
         </div>
       </div>
-      <div>- ${r.changes.join('<br/>- ')}</div>
+      <ul>${changes}</ul>
     `;
   };
 

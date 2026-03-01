@@ -84,7 +84,27 @@
     .muted { color: var(--muted); }
     .hero-line { display:flex; align-items:center; gap:10px; margin:8px 0; }
     .hero-line img { width:44px; height:44px; object-fit:cover; border-radius:8px; border:1px solid #3a4f83; }
-    .hero-name { font-weight:700; }
+    .hero-name { font-weight:700; font-size:1.02rem; }
+
+    #details {
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: #d6e2ff;
+    }
+
+    #details .muted {
+      color: #9bb0d8;
+      font-size: 0.88rem;
+    }
+
+    #details ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+    }
+
+    #details li {
+      margin: 3px 0;
+    }
 
     .kpi { min-width:220px; flex:1; }
     .kpi .label { font-size:11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
@@ -92,6 +112,13 @@
 
     .legend { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
     .dot { width:12px; height:12px; border-radius:2px; display:inline-block; }
+
+    @media (max-width: 760px) {
+      .wrap { padding: 14px 10px 24px; }
+      .card { padding: 10px; border-radius: 12px; }
+      .kpi { min-width: 100%; }
+      #details { font-size: 0.9rem; }
+    }
   </style>
 </head>
 <body>
@@ -125,9 +152,10 @@
       <div class="legend">
         <span class="muted">How to read:</span>
         <span><span class="dot" style="background:#7f1d1d"></span> strong nerf</span>
-        <span><span class="dot" style="background:#f59e0b"></span> slight nerf</span>
+        <span><span class="dot" style="background:#d9480f"></span> nerf</span>
         <span><span class="dot" style="background:#334155"></span> neutral</span>
-        <span><span class="dot" style="background:#22c55e"></span> buff</span>
+        <span><span class="dot" style="background:#14b8a6"></span> buff</span>
+        <span><span class="dot" style="background:#16a34a"></span> strong buff</span>
         <span class="muted">(Click any cell for exact notes)</span>
       </div>
     </div>
