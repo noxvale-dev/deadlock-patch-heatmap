@@ -72,16 +72,8 @@ function render() {
     };
   }
 
-  // Viridis-inspired 7-step palette mapped to -3..+3
-  const palette = {
-    minus3: '#440154',
-    minus2: '#46327e',
-    minus1: '#365c8d',
-    zero: '#277f8e',
-    plus1: '#1fa187',
-    plus2: '#4ac16d',
-    plus3: '#a0da39'
-  };
+  // Full viridis interpolation for -3..+3
+  const viridisStops = ['#440154', '#482878', '#3e4989', '#31688e', '#26828e', '#1f9e89', '#35b779', '#6ece58', '#b5de2b', '#fde725'];
 
   chart.setOption({
     tooltip: {
@@ -118,7 +110,8 @@ function render() {
       show: false,
       min: -3,
       max: 3,
-      inRange: { color: [palette.minus3, palette.minus2, palette.minus1, palette.zero, palette.plus1, palette.plus2, palette.plus3] }
+      calculable: false,
+      inRange: { color: viridisStops }
     },
     series: [{
       type: 'heatmap',
@@ -126,17 +119,7 @@ function render() {
       label: { show: false },
       itemStyle: {
         borderColor: '#0b1020',
-        borderWidth: 2,
-        color: (p) => {
-          const v = Number(p.data?.value?.[2] ?? 0);
-          if (v >= 3) return palette.plus3;
-          if (v === 2) return palette.plus2;
-          if (v === 1) return palette.plus1;
-          if (v === 0) return palette.zero;
-          if (v === -1) return palette.minus1;
-          if (v === -2) return palette.minus2;
-          return palette.minus3;
-        }
+        borderWidth: 2
       },
       emphasis: { itemStyle: { shadowBlur: 12, shadowColor: 'rgba(0,0,0,0.6)', borderColor: '#e5e7eb', borderWidth: 1 } }
     }]
