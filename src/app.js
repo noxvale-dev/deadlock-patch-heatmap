@@ -43,6 +43,10 @@ function render() {
   const sorted = [...filtered].sort((a,b)=>b.score-a.score);
   const mostBuffed = sorted.find(r=>r.score>0);
   const mostNerfed = [...sorted].reverse().find(r=>r.score<0);
+  const maxVisibleColumns = 6;
+  const initialEnd = patches.length > maxVisibleColumns
+    ? Math.max(15, (maxVisibleColumns / patches.length) * 100)
+    : 100;
   kpiHeroesEl.textContent = String(heroes.length);
   kpiBuffedEl.textContent = mostBuffed ? `${mostBuffed.hero} (${mostBuffed.score > 0 ? '+' : ''}${mostBuffed.score})` : 'None';
   kpiNerfedEl.textContent = mostNerfed ? `${mostNerfed.hero} (${mostNerfed.score})` : 'None';
@@ -73,8 +77,13 @@ function render() {
         return `<div style="max-width:360px"><b>${r.hero}</b> @ ${r.patch}<br/>impact: <b>${score}</b><br/><span style="color:#93a4c4">${r.tags.join(', ')}</span><hr style="border:none;border-top:1px solid #27314d"/>${r.changes.slice(0,3).join('<br/>')}</div>`;
       }
     },
-    grid: { top: 40, left: 170, right: 20, bottom: 80 },
-    xAxis: { type: 'category', data: patches, axisLabel: { rotate: 35 }, splitArea: { show: true } },
+    grid: { top: 40, left: 170, right: 20, bottom: 120 },
+    xAxis: {
+      type: 'category',
+      data: patches,
+      axisLabel: { rotate: 35 },
+      splitArea: { show: true }
+    },
     yAxis: {
       type: 'category',
       data: heroes,
@@ -91,6 +100,24 @@ function render() {
       max: 3,
       inRange: { color: ['#7f1d1d','#b91c1c','#f59e0b','#334155','#10b981','#22c55e','#15803d'] }
     },
+    dataZoom: [
+      {
+        type: 'slider',
+        xAxisIndex: 0,
+        start: 0,
+        end: initialEnd,
+        height: 12,
+        bottom: 88,
+        borderColor: '#27314d',
+        fillerColor: 'rgba(59,130,246,0.25)'
+      },
+      {
+        type: 'inside',
+        xAxisIndex: 0,
+        start: 0,
+        end: initialEnd
+      }
+    ],
     series: [{
       type: 'heatmap',
       data,
