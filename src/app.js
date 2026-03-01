@@ -72,14 +72,15 @@ function render() {
     };
   }
 
+  // Viridis-inspired 7-step palette mapped to -3..+3
   const palette = {
-    minus3: '#7f1d1d',
-    minus2: '#b91c1c',
-    minus1: '#d9480f',
-    zero: '#334155',
-    plus1: '#14b8a6',
-    plus2: '#22c55e',
-    plus3: '#16a34a'
+    minus3: '#440154',
+    minus2: '#46327e',
+    minus1: '#365c8d',
+    zero: '#277f8e',
+    plus1: '#1fa187',
+    plus2: '#4ac16d',
+    plus3: '#a0da39'
   };
 
   chart.setOption({
@@ -125,7 +126,7 @@ function render() {
       label: { show: false },
       itemStyle: {
         borderColor: '#0b1020',
-        borderWidth: 1,
+        borderWidth: 2,
         color: (p) => {
           const v = Number(p.data?.value?.[2] ?? 0);
           if (v >= 3) return palette.plus3;
