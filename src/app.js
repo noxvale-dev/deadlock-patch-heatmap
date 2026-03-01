@@ -45,7 +45,7 @@ function render() {
   const mostNerfed = [...sorted].reverse().find(r=>r.score<0);
 
   // Keep cells closer to square by adapting chart height to row/column ratio.
-  const gridLeft = 220;
+  const gridLeft = 290;
   const gridRight = 20;
   const gridTop = 40;
   const gridBottom = 120;
@@ -59,13 +59,13 @@ function render() {
   kpiNerfedEl.textContent = mostNerfed ? `${mostNerfed.hero} (${mostNerfed.score})` : 'None';
 
   const rich = {
-    name: { color: '#dbe7ff', align: 'left', padding: [0, 0, 0, 8], fontSize: 13, fontWeight: 600 }
+    name: { color: '#dbe7ff', align: 'left', padding: [0, 0, 0, 10], fontSize: 16, fontWeight: 700 }
   };
   for (const h of heroes) {
     const key = heroRichKey(h);
     rich[key] = {
-      height: 22,
-      width: 22,
+      height: 30,
+      width: 30,
       align: 'center',
       backgroundColor: { image: heroImage(h) },
       borderRadius: 3
@@ -103,7 +103,7 @@ function render() {
         hideOverlap: false,
         formatter: (value) => `{${heroRichKey(value)}| } {name|${value}}`,
         rich,
-        margin: 10
+        margin: 14
       }
     },
     visualMap: {
@@ -119,7 +119,8 @@ function render() {
       label: { show: false },
       itemStyle: {
         borderColor: '#0b1020',
-        borderWidth: 2
+        borderWidth: 6,
+        borderRadius: 2
       },
       emphasis: { itemStyle: { shadowBlur: 12, shadowColor: 'rgba(0,0,0,0.6)', borderColor: '#e5e7eb', borderWidth: 1 } }
     }]
