@@ -4,6 +4,10 @@ const chartEl = document.getElementById('chart');
 const detailsEl = document.getElementById('details');
 const searchEl = document.getElementById('search');
 const tagEl = document.getElementById('tag');
+if (!window.echarts) {
+  chartEl.innerHTML = '<div class="muted">Chart library failed to load. Hard refresh once; if still broken, report this message.</div>';
+  throw new Error('ECharts not loaded');
+}
 const chart = echarts.init(chartEl);
 const kpiHeroesEl = document.getElementById('kpiHeroes');
 const kpiBuffedEl = document.getElementById('kpiBuffed');
