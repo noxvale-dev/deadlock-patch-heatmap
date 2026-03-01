@@ -26,6 +26,20 @@ function render() {
   const patches = [...new Set(filtered.map(r => r.patch))].sort();
   const data = filtered.map(r => [patches.indexOf(r.patch), heroes.indexOf(r.hero), r.score, r]);
 
+  const rich = {
+    name: { color: '#dbe7ff', align: 'left', padding: [0, 0, 0, 6], fontSize: 11 }
+  };
+  for (const h of heroes) {
+    const key = `h_${slugifyHero(h)}`;
+    rich[key] = {
+      height: 16,
+      width: 16,
+      align: 'center',
+      backgroundColor: { image: heroImage(h) },
+      borderRadius: 3
+    };
+  }
+
   chart.setOption({
     tooltip: {
       formatter: (p) => {
@@ -33,9 +47,17 @@ function render() {
         return `<b>${r.hero}</b> @ ${r.patch}<br/>score: <b>${r.score}</b><br/>${r.changes.slice(0,3).join('<br/>')}`;
       }
     },
-    grid: { top: 40, left: 120, right: 20, bottom: 80 },
+    grid: { top: 40, left: 170, right: 20, bottom: 80 },
     xAxis: { type: 'category', data: patches, axisLabel: { rotate: 35 } },
-    yAxis: { type: 'category', data: heroes },
+    yAxis: {
+      type: 'category',
+      data: heroes,
+      axisLabel: {
+        formatter: (value) => `{h_${slugifyHero(value)}| } {name|${value}}`,
+        rich,
+        margin: 10
+      }
+    },
     visualMap: {
       min: -3, max: 3, calculable: true, orient: 'horizontal', left: 'center', bottom: 10,
       inRange: { color: ['#7f1d1d','#b91c1c','#f59e0b','#1f2937','#10b981','#22c55e','#15803d'] }
