@@ -12,6 +12,11 @@ python3 -m http.server 8080
 
 Then open: `http://localhost:8080`
 
+## Hero images
+
+Add portrait files in `data/hero-images/` (see `data/hero-images/README.md`).
+Missing portraits automatically fall back to `placeholder.svg`.
+
 ## Importing patches
 
 1. Add markdown files under `data/patches/`.

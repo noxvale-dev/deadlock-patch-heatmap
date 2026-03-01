@@ -8,6 +8,15 @@ const chart = echarts.init(chartEl);
 
 let all = [];
 
+function slugifyHero(name) {
+  return name.toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+}
+
+function heroImage(name) {
+  const slug = slugifyHero(name);
+  return `./data/hero-images/${slug}.png`;
+}
+
 function render() {
   const q = searchEl.value.trim().toLowerCase();
   const tag = tagEl.value;
@@ -42,7 +51,17 @@ function render() {
   chart.off('click');
   chart.on('click', (p) => {
     const r = p.data[3];
-    detailsEl.textContent = `${r.hero} @ ${r.patch}\nscore: ${r.score}\ntags: ${r.tags.join(', ')}\n\n- ${r.changes.join('\n- ')}`;
+    const img = heroImage(r.hero);
+    detailsEl.innerHTML = `
+      <div class="hero-line">
+        <img src="${img}" onerror="this.onerror=null;this.src='./data/hero-images/placeholder.svg'" alt="${r.hero}" />
+        <div>
+          <div class="hero-name">${r.hero} @ ${r.patch}</div>
+          <div class="muted">score: ${r.score} · tags: ${r.tags.join(', ')}</div>
+        </div>
+      </div>
+      <div>- ${r.changes.join('<br/>- ')}</div>
+    `;
   });
 }
 
