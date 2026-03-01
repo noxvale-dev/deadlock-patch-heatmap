@@ -144,12 +144,14 @@ function render() {
   const renderDetails = (r) => {
     const img = heroImage(r.hero);
     const changes = (r.changes || []).map(c => `<li>${c}</li>`).join('');
+    const tags = (r.tags || []).map(t => `<span class="pill">${t}</span>`).join('');
     detailsEl.innerHTML = `
       <div class="hero-line">
         <img src="${img}" onerror="this.onerror=null;this.src='./data/hero-images/placeholder.svg'" alt="${r.hero}" />
         <div>
           <div class="hero-name">${r.hero} @ ${r.patch}</div>
-          <div class="muted">score: ${r.score > 0 ? '+' : ''}${r.score} · tags: ${r.tags.join(', ')}</div>
+          <div class="muted">score: ${r.score > 0 ? '+' : ''}${r.score}</div>
+          <div style="margin-top:6px">${tags}</div>
         </div>
       </div>
       <ul>${changes}</ul>
