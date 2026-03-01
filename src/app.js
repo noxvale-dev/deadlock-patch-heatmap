@@ -81,12 +81,9 @@ function render() {
       }
     },
     visualMap: {
+      show: false,
       min: -3,
       max: 3,
-      calculable: true,
-      orient: 'horizontal',
-      left: 'center',
-      bottom: 10,
       inRange: { color: ['#7f1d1d','#b91c1c','#f59e0b','#334155','#10b981','#22c55e','#15803d'] }
     },
     series: [{
@@ -95,7 +92,17 @@ function render() {
       label: { show: false },
       itemStyle: {
         borderColor: '#0b1020',
-        borderWidth: 1
+        borderWidth: 1,
+        color: (p) => {
+          const v = Number(p.data?.[2] ?? 0);
+          if (v >= 3) return '#15803d';
+          if (v === 2) return '#22c55e';
+          if (v === 1) return '#10b981';
+          if (v === 0) return '#334155';
+          if (v === -1) return '#f59e0b';
+          if (v === -2) return '#b91c1c';
+          return '#7f1d1d';
+        }
       },
       emphasis: { itemStyle: { shadowBlur: 12, shadowColor: 'rgba(0,0,0,0.6)', borderColor: '#e5e7eb', borderWidth: 1 } }
     }]
@@ -122,8 +129,17 @@ function render() {
 }
 
 async function main() {
-  all = await loadScores();
-  render();
+  try {
+    all = await loadScores();
+    if (!all.length) {
+      chartEl.innerHTML = '<div class="muted">No data loaded. Check patch files/index.</div>';
+      return;
+    }
+    render();
+  } catch (e) {
+    chartEl.innerHTML = `<div class="muted">Failed to load chart data: ${String(e)}</div>`;
+    throw e;
+  }
 }
 
 searchEl.addEventListener('input', render);
