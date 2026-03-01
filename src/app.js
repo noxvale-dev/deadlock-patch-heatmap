@@ -35,7 +35,10 @@ function render() {
 
   const heroes = [...new Set(filtered.map(r => r.hero))];
   const patches = [...new Set(filtered.map(r => r.patch))].sort();
-  const data = filtered.map(r => [patches.indexOf(r.patch), heroes.indexOf(r.hero), r.score, r]);
+  const data = filtered.map(r => ({
+    value: [patches.indexOf(r.patch), heroes.indexOf(r.hero), r.score],
+    meta: r
+  }));
 
   const sorted = [...filtered].sort((a,b)=>b.score-a.score);
   const mostBuffed = sorted.find(r=>r.score>0);
@@ -64,16 +67,18 @@ function render() {
       borderColor: '#334155',
       textStyle: { color: '#e5e7eb' },
       formatter: (p) => {
-        const r = p.data[3];
+        const r = p.data?.meta;
+        if (!r) return 'No data';
         const score = r.score > 0 ? `+${r.score}` : `${r.score}`;
         return `<div style="max-width:360px"><b>${r.hero}</b> @ ${r.patch}<br/>impact: <b>${score}</b><br/><span style="color:#93a4c4">${r.tags.join(', ')}</span><hr style="border:none;border-top:1px solid #27314d"/>${r.changes.slice(0,3).join('<br/>')}</div>`;
       }
     },
     grid: { top: 40, left: 170, right: 20, bottom: 80 },
-    xAxis: { type: 'category', data: patches, axisLabel: { rotate: 35 } },
+    xAxis: { type: 'category', data: patches, axisLabel: { rotate: 35 }, splitArea: { show: true } },
     yAxis: {
       type: 'category',
       data: heroes,
+      splitArea: { show: true },
       axisLabel: {
         formatter: (value) => `{${heroRichKey(value)}| } {name|${value}}`,
         rich,
@@ -94,7 +99,7 @@ function render() {
         borderColor: '#0b1020',
         borderWidth: 1,
         color: (p) => {
-          const v = Number(p.data?.[2] ?? 0);
+          const v = Number(p.data?.value?.[2] ?? 0);
           if (v >= 3) return '#15803d';
           if (v === 2) return '#22c55e';
           if (v === 1) return '#10b981';
@@ -123,7 +128,10 @@ function render() {
   };
 
   chart.off('click');
-  chart.on('click', (p) => renderDetails(p.data[3]));
+  chart.on('click', (p) => {
+    const r = p.data?.meta;
+    if (r) renderDetails(r);
+  });
 
   if (mostBuffed) renderDetails(mostBuffed);
 }
