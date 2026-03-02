@@ -18,7 +18,7 @@ const patchWindowLabel = document.getElementById('patchWindowLabel');
 
 let all = [];
 let patchWindowStart = 0;
-const PATCH_WINDOW_SIZE = 14;
+const PATCH_WINDOW_SIZE = 10;
 
 function slugifyHero(name) {
   return name.toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
@@ -69,8 +69,8 @@ function render() {
   const gridTop = 40;
   const gridBottom = 120;
   const usableWidth = Math.max(280, chartEl.clientWidth - gridLeft - gridRight);
-  const baseCell = (usableWidth / Math.max(1, visiblePatches.length)) * 0.6;
-  const cellSize = Math.max(12, Math.min(20, Math.round(baseCell)));
+  const baseCell = (usableWidth / Math.max(1, visiblePatches.length)) * 0.58;
+  const cellSize = Math.max(14, Math.min(22, Math.round(baseCell)));
   const targetHeight = Math.max(720, Math.min(1700, Math.round(gridTop + gridBottom + heroes.length * cellSize)));
   chartEl.style.height = `${targetHeight}px`;
   chart.resize();
@@ -79,13 +79,13 @@ function render() {
   kpiNerfedEl.textContent = mostNerfed ? `${mostNerfed.hero} (${mostNerfed.score})` : 'None';
 
   const rich = {
-    name: { color: '#dbe7ff', align: 'left', padding: [0, 0, 0, 12], fontSize: 17, fontWeight: 700 }
+    name: { color: '#dbe7ff', align: 'left', padding: [0, 0, 0, 12], fontSize: 15, fontWeight: 700, lineHeight: 20 }
   };
   for (const h of heroes) {
     const key = heroRichKey(h);
     rich[key] = {
-      height: 34,
-      width: 34,
+      height: 30,
+      width: 30,
       align: 'center',
       backgroundColor: { image: heroImage(h) },
       borderRadius: 3
@@ -123,7 +123,7 @@ function render() {
         hideOverlap: false,
         formatter: (value) => `{${heroRichKey(value)}| } {name|${value}}`,
         rich,
-        margin: 14
+        margin: 12
       }
     },
     visualMap: {
@@ -139,7 +139,7 @@ function render() {
       label: { show: false },
       itemStyle: {
         borderColor: '#0b1020',
-        borderWidth: 6,
+        borderWidth: 7,
         borderRadius: 2
       },
       emphasis: { itemStyle: { shadowBlur: 12, shadowColor: 'rgba(0,0,0,0.6)', borderColor: '#e5e7eb', borderWidth: 1 } }
