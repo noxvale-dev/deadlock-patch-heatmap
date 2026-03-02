@@ -55,6 +55,12 @@
       border-radius: 14px;
       padding: 12px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 10px 24px rgba(0,0,0,0.22);
+      transition: transform .15s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+
+    .card:hover {
+      border-color: #37539a;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 14px 30px rgba(0,0,0,0.26);
     }
 
     #chart {
@@ -79,6 +85,13 @@
       border-radius: 10px;
       padding: 8px 10px;
       font-family: 'Space Grotesk', sans-serif;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+
+    select:focus-visible, input:focus-visible {
+      outline: none;
+      border-color: #5b8dff;
+      box-shadow: 0 0 0 3px rgba(91,141,255,.22);
     }
 
     .muted { color: var(--muted); }
@@ -110,16 +123,77 @@
     .kpi .label { font-size:11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
     .kpi .value { font-size:22px; font-weight:700; color: #f3f7ff; }
 
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .kpi-grid .kpi { min-width: 0; }
+
     .legend { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
     .dot { width:12px; height:12px; border-radius:2px; display:inline-block; }
     .pill { display:inline-block; padding:2px 8px; border:1px solid #37508e; border-radius:999px; margin-right:6px; font-size:11px; color:#b7ccf5; background:rgba(34,211,238,.08); }
     .legend-bar { width:240px; height:10px; border-radius:999px; border:1px solid #2f467c; background:linear-gradient(90deg,#440154,#482878,#3e4989,#31688e,#26828e,#1f9e89,#35b779,#6ece58,#b5de2b,#fde725); }
 
+    .section-title {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: #9db3df;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(180deg,#22d3ee,#4f46e5);
+      box-shadow: 0 0 8px rgba(34,211,238,.6);
+    }
+
+    .nav-btn {
+      background:#0f1730;
+      border:1px solid #35508b;
+      color:#dbe7ff;
+      border-radius:8px;
+      padding:6px 10px;
+      cursor:pointer;
+      font-weight:600;
+      transition:all .15s ease;
+      min-height: 32px;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      border-color:#5b8dff;
+      transform: translateY(-1px);
+    }
+
+    .nav-btn.is-active {
+      border-color:#77a8ff;
+      box-shadow: 0 0 0 2px rgba(119,168,255,.24);
+      background: #16254d;
+    }
+
+    .nav-btn:disabled {
+      opacity:.45;
+      cursor:not-allowed;
+    }
+
+    @media (max-width: 980px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+    }
+
     @media (max-width: 760px) {
       .wrap { padding: 14px 10px 24px; }
       .card { padding: 10px; border-radius: 12px; }
       .kpi { min-width: 100%; }
-      #details { font-size: 0.9rem; }
+      #details { font-size: 0.95rem; }
     }
   </style>
 </head>
@@ -144,13 +218,14 @@
       </div>
     </div>
 
-    <div class="row" style="margin-top:16px">
+    <div class="kpi-grid">
       <div class="card kpi"><div class="label">Visible heroes</div><div id="kpiHeroes" class="value">-</div></div>
       <div class="card kpi"><div class="label">Most buffed (current filters)</div><div id="kpiBuffed" class="value">-</div></div>
       <div class="card kpi"><div class="label">Most nerfed (current filters)</div><div id="kpiNerfed" class="value">-</div></div>
     </div>
 
     <div class="card" style="margin-top:16px">
+      <h3 class="section-title">Legend & patch window</h3>
       <div class="legend">
         <span class="muted">How to read:</span>
         <span class="legend-bar"></span>
@@ -162,15 +237,24 @@
         <span class="muted">(Click any cell for exact notes)</span>
       </div>
       <div style="margin-top:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap">
-        <button id="prevPatches" style="background:#0f1730;border:1px solid #35508b;color:#dbe7ff;border-radius:8px;padding:6px 10px">◀ Prev</button>
-        <button id="nextPatches" style="background:#0f1730;border:1px solid #35508b;color:#dbe7ff;border-radius:8px;padding:6px 10px">Next ▶</button>
+        <button id="prevPatches" class="nav-btn">◀ Prev</button>
+        <button id="nextPatches" class="nav-btn">Next ▶</button>
         <span id="patchWindowLabel" class="muted"></span>
+      </div>
+      <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+        <button id="window10" class="nav-btn">10</button>
+        <button id="window14" class="nav-btn">14</button>
+        <button id="window20" class="nav-btn">20</button>
+        <span class="muted">columns per view</span>
       </div>
     </div>
 
-    <div class="card" style="margin-top:16px"><div id="chart"></div></div>
     <div class="card" style="margin-top:16px">
-      <h3>Selection details</h3>
+      <h3 class="section-title">Patch matrix</h3>
+      <div id="chart"></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3 class="section-title">Selection details</h3>
       <div id="details" class="muted">Click a cell to inspect changes.</div>
     </div>
   </div>

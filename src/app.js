@@ -15,10 +15,13 @@ const kpiNerfedEl = document.getElementById('kpiNerfed');
 const prevPatchesBtn = document.getElementById('prevPatches');
 const nextPatchesBtn = document.getElementById('nextPatches');
 const patchWindowLabel = document.getElementById('patchWindowLabel');
+const window10Btn = document.getElementById('window10');
+const window14Btn = document.getElementById('window14');
+const window20Btn = document.getElementById('window20');
 
 let all = [];
 let patchWindowStart = 0;
-const PATCH_WINDOW_SIZE = 10;
+let patchWindowSize = 10;
 
 function slugifyHero(name) {
   return name.toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
@@ -41,11 +44,11 @@ function render() {
   const heroes = [...new Set(filtered.map(r => r.hero))];
   const allPatches = [...new Set(filtered.map(r => r.patch))].sort();
 
-  if (patchWindowStart > Math.max(0, allPatches.length - PATCH_WINDOW_SIZE)) {
-    patchWindowStart = Math.max(0, allPatches.length - PATCH_WINDOW_SIZE);
+  if (patchWindowStart > Math.max(0, allPatches.length - patchWindowSize)) {
+    patchWindowStart = Math.max(0, allPatches.length - patchWindowSize);
   }
 
-  const visiblePatches = allPatches.slice(patchWindowStart, patchWindowStart + PATCH_WINDOW_SIZE);
+  const visiblePatches = allPatches.slice(patchWindowStart, patchWindowStart + patchWindowSize);
   const patchSet = new Set(visiblePatches);
 
   const data = filtered
@@ -59,9 +62,14 @@ function render() {
   const mostBuffed = sorted.find(r=>r.score>0);
   const mostNerfed = [...sorted].reverse().find(r=>r.score<0);
 
-  patchWindowLabel.textContent = `Patches ${patchWindowStart + 1}-${Math.min(allPatches.length, patchWindowStart + PATCH_WINDOW_SIZE)} of ${allPatches.length}`;
+  patchWindowLabel.textContent = `Patches ${patchWindowStart + 1}-${Math.min(allPatches.length, patchWindowStart + patchWindowSize)} of ${allPatches.length}`;
   prevPatchesBtn.disabled = patchWindowStart <= 0;
-  nextPatchesBtn.disabled = patchWindowStart + PATCH_WINDOW_SIZE >= allPatches.length;
+  nextPatchesBtn.disabled = patchWindowStart + patchWindowSize >= allPatches.length;
+
+  [window10Btn, window14Btn, window20Btn].forEach(b => b?.classList.remove('is-active'));
+  if (patchWindowSize === 10) window10Btn?.classList.add('is-active');
+  if (patchWindowSize === 14) window14Btn?.classList.add('is-active');
+  if (patchWindowSize === 20) window20Btn?.classList.add('is-active');
 
   // Keep cells closer to square by adapting chart height to row/column ratio.
   const gridLeft = 320;
@@ -176,7 +184,7 @@ async function main() {
   try {
     all = await loadScores();
     const initialPatches = [...new Set(all.map(r => r.patch))].sort();
-    patchWindowStart = Math.max(0, initialPatches.length - PATCH_WINDOW_SIZE);
+    patchWindowStart = Math.max(0, initialPatches.length - patchWindowSize);
     if (!all.length) {
       chartEl.innerHTML = '<div class="muted">No data loaded. Check patch files/index.</div>';
       return;
@@ -191,11 +199,26 @@ async function main() {
 searchEl.addEventListener('input', () => { patchWindowStart = 0; render(); });
 tagEl.addEventListener('change', () => { patchWindowStart = 0; render(); });
 prevPatchesBtn?.addEventListener('click', () => {
-  patchWindowStart = Math.max(0, patchWindowStart - PATCH_WINDOW_SIZE);
+  patchWindowStart = Math.max(0, patchWindowStart - patchWindowSize);
   render();
 });
 nextPatchesBtn?.addEventListener('click', () => {
-  patchWindowStart = patchWindowStart + PATCH_WINDOW_SIZE;
+  patchWindowStart = patchWindowStart + patchWindowSize;
+  render();
+});
+window10Btn?.addEventListener('click', () => {
+  patchWindowSize = 10;
+  patchWindowStart = Math.max(0, [...new Set(all.map(r => r.patch))].length - patchWindowSize);
+  render();
+});
+window14Btn?.addEventListener('click', () => {
+  patchWindowSize = 14;
+  patchWindowStart = Math.max(0, [...new Set(all.map(r => r.patch))].length - patchWindowSize);
+  render();
+});
+window20Btn?.addEventListener('click', () => {
+  patchWindowSize = 20;
+  patchWindowStart = Math.max(0, [...new Set(all.map(r => r.patch))].length - patchWindowSize);
   render();
 });
 window.addEventListener('resize', () => chart.resize());
